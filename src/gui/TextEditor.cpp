@@ -299,7 +299,7 @@ bool TextEditor::imDeleteSurroundingCallback(GtkIMContext* context, gint offset,
 	return true;
 }
 
-void TextEditor::insertTime(bool newline) {
+void TextEditor::insertTime(bool date, bool newline) {
 	time_t rawtime;
 	struct tm * timeinfo;
 	char val_date[20];
@@ -311,14 +311,15 @@ void TextEditor::insertTime(bool newline) {
 	strftime(val_date,sizeof(val_date),"%d.%m.%Y",timeinfo);
 	strftime(val_time,sizeof(val_time),"%H:%M:%S",timeinfo);
 
-	iMCommitCallback(NULL, val_date, this);
-	if(newline) {
-		iMCommitCallback(NULL, "\n", this);
-	} else {
-		iMCommitCallback(NULL, " ", this);
-	}
+	if(date) {
+        iMCommitCallback(NULL, val_date, this);
+        if (newline) {
+            iMCommitCallback(NULL, "\n", this);
+        } else {
+            iMCommitCallback(NULL, " ", this);
+        }
+    }
 	iMCommitCallback(NULL, val_time, this);
-
 }
 
 bool TextEditor::onKeyPressEvent(GdkEventKey* event)
@@ -366,9 +367,9 @@ bool TextEditor::onKeyPressEvent(GdkEventKey* event)
 			decSize();
 			return true;
 		}
-        if(event->keyval == GDK_KEY_k || event->keyval == GDK_KEY_K) {
+        if(event->keyval == GDK_KEY_k || event->keyval == GDK_KEY_K || event->keyval == GDK_KEY_t) {
             this->resetImContext();
-            this->insertTime(event->keyval == GDK_KEY_K);
+            this->insertTime(event->keyval != GDK_KEY_t, event->keyval == GDK_KEY_K);
             obscure = true;
             retval = true;
         }
