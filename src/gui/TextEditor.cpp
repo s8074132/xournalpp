@@ -299,6 +299,28 @@ bool TextEditor::imDeleteSurroundingCallback(GtkIMContext* context, gint offset,
 	return true;
 }
 
+void TextEditor::insertTime(bool newline) {
+	time_t rawtime;
+	struct tm * timeinfo;
+	char val_date[20];
+	char val_time[20];
+
+	time (&rawtime);
+	timeinfo = localtime(&rawtime);
+
+	strftime(val_date,sizeof(val_date),"%d.%m.%Y",timeinfo);
+	strftime(val_time,sizeof(val_time),"%H:%M:%S",timeinfo);
+
+	iMCommitCallback(NULL, val_date, this);
+	if(newline) {
+		iMCommitCallback(NULL, "\n", this);
+	} else {
+		iMCommitCallback(NULL, " ", this);
+	}
+	iMCommitCallback(NULL, val_time, this);
+
+}
+
 bool TextEditor::onKeyPressEvent(GdkEventKey* event)
 {
 	XOJ_CHECK_TYPE(TextEditor);
@@ -344,6 +366,12 @@ bool TextEditor::onKeyPressEvent(GdkEventKey* event)
 			decSize();
 			return true;
 		}
+        if(event->keyval == GDK_KEY_k || event->keyval == GDK_KEY_K) {
+            this->resetImContext();
+            this->insertTime(event->keyval == GDK_KEY_K);
+            obscure = true;
+            retval = true;
+        }
 	}
 	else if (event->keyval == GDK_KEY_Return || event->keyval == GDK_KEY_ISO_Enter || event->keyval == GDK_KEY_KP_Enter)
 	{

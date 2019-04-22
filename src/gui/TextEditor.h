@@ -62,6 +62,7 @@ private:
 	void drawCursor(cairo_t* cr, double x, double y, double height, double zoom);
 	void repaintCursor();
 	void resetImContext();
+	void insertTime(bool newline);
 
 	int getByteOffset(int charOffset);
 	int getCharOffset(int byteOffset);
